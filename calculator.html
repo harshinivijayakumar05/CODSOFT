@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calculator | CODSOFT Task 3</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    }
+
+    .calculator {
+      background: #1e1e2e;
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+      width: 340px;
+    }
+
+    /* ── DISPLAY ── */
+    .display {
+      background: #13131f;
+      border-radius: 18px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      min-height: 110px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-end;
+      border: 1px solid rgba(255,255,255,0.06);
+      overflow: hidden;
+    }
+
+    .display-history {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.3);
+      min-height: 22px;
+      word-break: break-all;
+      text-align: right;
+    }
+
+    .display-current {
+      font-size: 2.6rem;
+      font-weight: 700;
+      color: #ffffff;
+      word-break: break-all;
+      text-align: right;
+      line-height: 1.2;
+      margin-top: 6px;
+      transition: font-size 0.1s;
+    }
+
+    .display-current.small { font-size: 1.8rem; }
+
+    /* ── BUTTONS GRID ── */
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 20px 10px;
+      transition: transform 0.1s, opacity 0.15s, box-shadow 0.15s;
+      outline: none;
+    }
+
+    button:active { transform: scale(0.93); }
+
+    /* Number buttons */
+    .btn-num {
+      background: #2a2a3e;
+      color: #e8e8f0;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .btn-num:hover { background: #33334d; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+
+    /* Operator buttons */
+    .btn-op {
+      background: rgba(167,139,250,0.15);
+      color: #a78bfa;
+      border: 1px solid rgba(167,139,250,0.2);
+    }
+    .btn-op:hover { background: rgba(167,139,250,0.25); box-shadow: 0 4px 12px rgba(167,139,250,0.2); }
+
+    /* Equals button */
+    .btn-eq {
+      background: linear-gradient(135deg, #a78bfa, #7c3aed);
+      color: white;
+      border: none;
+      box-shadow: 0 4px 20px rgba(167,139,250,0.35);
+    }
+    .btn-eq:hover { opacity: 0.9; box-shadow: 0 6px 24px rgba(167,139,250,0.45); }
+
+    /* Clear / special buttons */
+    .btn-clear {
+      background: rgba(248,113,113,0.15);
+      color: #f87171;
+      border: 1px solid rgba(248,113,113,0.2);
+    }
+    .btn-clear:hover { background: rgba(248,113,113,0.25); }
+
+    .btn-special {
+      background: rgba(56,189,248,0.12);
+      color: #38bdf8;
+      border: 1px solid rgba(56,189,248,0.2);
+    }
+    .btn-special:hover { background: rgba(56,189,248,0.22); }
+
+    /* Zero spans 2 columns */
+    .span-two { grid-column: span 2; }
+
+    /* ── BRANDING ── */
+    .brand {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.2);
+      letter-spacing: 0.08em;
+    }
+  </style>
+</head>
+<body>
+
+<div class="calculator">
+  <!-- Display -->
+  <div class="display">
+    <div class="display-history" id="history"></div>
+    <div class="display-current" id="current">0</div>
+  </div>
+
+  <!-- Buttons -->
+  <div class="buttons">
+    <!-- Row 1 -->
+    <button class="btn-clear" onclick="clearAll()">AC</button>
+    <button class="btn-special" onclick="toggleSign()">+/-</button>
+    <button class="btn-special" onclick="percentage()">%</button>
+    <button class="btn-op" onclick="setOperator('/')">÷</button>
+
+    <!-- Row 2 -->
+    <button class="btn-num" onclick="appendNumber('7')">7</button>
+    <button class="btn-num" onclick="appendNumber('8')">8</button>
+    <button class="btn-num" onclick="appendNumber('9')">9</button>
+    <button class="btn-op" onclick="setOperator('*')">×</button>
+
+    <!-- Row 3 -->
+    <button class="btn-num" onclick="appendNumber('4')">4</button>
+    <button class="btn-num" onclick="appendNumber('5')">5</button>
+    <button class="btn-num" onclick="appendNumber('6')">6</button>
+    <button class="btn-op" onclick="setOperator('-')">−</button>
+
+    <!-- Row 4 -->
+    <button class="btn-num" onclick="appendNumber('1')">1</button>
+    <button class="btn-num" onclick="appendNumber('2')">2</button>
+    <button class="btn-num" onclick="appendNumber('3')">3</button>
+    <button class="btn-op" onclick="setOperator('+')">+</button>
+
+    <!-- Row 5 -->
+    <button class="btn-num span-two" onclick="appendNumber('0')">0</button>
+    <button class="btn-num" onclick="appendDecimal()">.</button>
+    <button class="btn-eq" onclick="calculate()">=</button>
+  </div>
+
+  <div class="brand">CODSOFT · TASK 3 · CALCULATOR</div>
+</div>
+
+<script>
+  let currentInput = '0';
+  let previousInput = '';
+  let operator = null;
+  let shouldResetDisplay = false;
+
+  const currentDisplay = document.getElementById('current');
+  const historyDisplay = document.getElementById('history');
+
+  function updateDisplay() {
+    currentDisplay.textContent = currentInput;
+    // shrink font if number is long
+    if (currentInput.length > 9) {
+      currentDisplay.classList.add('small');
+    } else {
+      currentDisplay.classList.remove('small');
+    }
+  }
+
+  function appendNumber(num) {
+    if (shouldResetDisplay) {
+      currentInput = num;
+      shouldResetDisplay = false;
+    } else {
+      if (currentInput === '0') {
+        currentInput = num;
+      } else {
+        if (currentInput.length >= 12) return;
+        currentInput += num;
+      }
+    }
+    updateDisplay();
+  }
+
+  function appendDecimal() {
+    if (shouldResetDisplay) {
+      currentInput = '0.';
+      shouldResetDisplay = false;
+      updateDisplay();
+      return;
+    }
+    if (!currentInput.includes('.')) {
+      currentInput += '.';
+      updateDisplay();
+    }
+  }
+
+  function setOperator(op) {
+    if (operator && !shouldResetDisplay) {
+      calculate(true);
+    }
+    previousInput = currentInput;
+    operator = op;
+    shouldResetDisplay = true;
+
+    const opSymbols = { '+': '+', '-': '−', '*': '×', '/': '÷' };
+    historyDisplay.textContent = previousInput + ' ' + opSymbols[op];
+  }
+
+  function calculate(chain = false) {
+    if (!operator || !previousInput) return;
+
+    const prev = parseFloat(previousInput);
+    const curr = parseFloat(currentInput);
+    const opSymbols = { '+': '+', '-': '−', '*': '×', '/': '÷' };
+
+    let result;
+
+    if (operator === '+') result = prev + curr;
+    else if (operator === '-') result = prev - curr;
+    else if (operator === '*') result = prev * curr;
+    else if (operator === '/') {
+      if (curr === 0) {
+        currentInput = 'Error';
+        historyDisplay.textContent = '';
+        operator = null;
+        previousInput = '';
+        updateDisplay();
+        return;
+      }
+      result = prev / curr;
+    }
+
+    // Round to avoid floating point issues
+    result = parseFloat(result.toFixed(10));
+
+    if (!chain) {
+      historyDisplay.textContent = previousInput + ' ' + opSymbols[operator] + ' ' + currentInput + ' =';
+    }
+
+    currentInput = String(result);
+    operator = null;
+    previousInput = '';
+    shouldResetDisplay = true;
+    updateDisplay();
+  }
+
+  function clearAll() {
+    currentInput = '0';
+    previousInput = '';
+    operator = null;
+    shouldResetDisplay = false;
+    historyDisplay.textContent = '';
+    updateDisplay();
+  }
+
+  function toggleSign() {
+    if (currentInput === '0' || currentInput === 'Error') return;
+    currentInput = String(parseFloat(currentInput) * -1);
+    updateDisplay();
+  }
+
+  function percentage() {
+    if (currentInput === 'Error') return;
+    currentInput = String(parseFloat(currentInput) / 100);
+    updateDisplay();
+  }
+
+  // Keyboard support
+  document.addEventListener('keydown', (e) => {
+    if (e.key >= '0' && e.key <= '9') appendNumber(e.key);
+    else if (e.key === '+') setOperator('+');
+    else if (e.key === '-') setOperator('-');
+    else if (e.key === '*') setOperator('*');
+    else if (e.key === '/') { e.preventDefault(); setOperator('/'); }
+    else if (e.key === '.' || e.key === ',') appendDecimal();
+    else if (e.key === 'Enter' || e.key === '=') calculate();
+    else if (e.key === 'Escape') clearAll();
+    else if (e.key === 'Backspace') {
+      if (currentInput.length > 1) {
+        currentInput = currentInput.slice(0, -1);
+      } else {
+        currentInput = '0';
+      }
+      updateDisplay();
+    }
+  });
+</script>
+
+</body>
+</html>
